@@ -13,7 +13,6 @@ import(
 func main(){
 	fmt.Println("Enter points file path to process....")
 	var filepath string
-	//filepath = "data/points.csv"
 	fmt.Scan(&filepath)
 	if filepath == "" {
 		fmt.Println("Invalid file path")
