@@ -1,16 +1,9 @@
 package main
 
 import(
-	"bufio"
-    "encoding/csv"
-    //"encoding/json"
     "fmt"
-    "io"
-    "log"
 	"os"
-	"strconv"
 	"math"
-	//"time"
 	"go-gps-filter/filter_utility"
 	"go-gps-filter/point"
 )
@@ -20,34 +13,17 @@ import(
 func main(){
 	fmt.Println("Enter points file path to process....")
 	var filepath string
-	filepath = "data/points.csv"
+	//filepath = "data/points.csv"
 	fmt.Scan(&filepath)
 	if filepath == "" {
 		fmt.Println("Invalid file path")
 		os.Exit(3)
 	}
-	csvFile, _ := os.Open(filepath)
-	reader := csv.NewReader(bufio.NewReader(csvFile))
-	var points []point.Point
-	for {
-        line, error := reader.Read()
-        if error == io.EOF {
-            break
-        } else if error != nil {
-            log.Fatal(error)
-		}
-
-		lat,_ := strconv.ParseFloat(line[0],64)
-		long,_ := strconv.ParseFloat(line[1],64)
-		ts,_ := strconv.ParseInt(line[2],10,64)
-		
-        points = append(points, point.Point{
-            Lattitude: lat,
-            Longitude:  long,
-			Timestamp:  ts,
-		})
-	}
 	
+	//read Points file 
+	points:= filter_utility.ReadPointsFile(filepath)
+
+	//Calculate speed using distance and time 
 	for idx,val:= range points{
 		if idx > 0 {
 			//calculate distance between two points
@@ -62,6 +38,8 @@ func main(){
 		
 	}
 
+	fmt.Println("Total Available  Points", len(points))
+
 	var nonZeroPoints []point.Point
 	//Filter points with zero speed
 	for _,val:= range points{
@@ -70,7 +48,7 @@ func main(){
 		}
 	}
 
-	fmt.Println(len(nonZeroPoints))
+	fmt.Println("Total Non Zero Points:", len(nonZeroPoints))
 
 	//Get Standard daviation for speed
 	sd:= int64(filter_utility.CalculateSDForSpeed(nonZeroPoints))
@@ -82,6 +60,8 @@ func main(){
 			nonOutlierPoints = append(nonOutlierPoints,val)
 		}
 	}
+
+	fmt.Println("Total Non outlier Points:", len(nonOutlierPoints))
 
 	//Generate the output file
 	filter_utility.WritePointsResult(nonOutlierPoints)
