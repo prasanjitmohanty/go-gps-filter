@@ -21,11 +21,11 @@ func main(){
 	fmt.Println("Enter points file path to process....")
 	var filepath string
 	filepath = "data/points.csv"
-	// fmt.Scan(&filepath)
-	// if filepath == "" {
-	// 	fmt.Println("Invalid file path")
-	// 	os.Exit(3)
-	// }
+	fmt.Scan(&filepath)
+	if filepath == "" {
+		fmt.Println("Invalid file path")
+		os.Exit(3)
+	}
 	csvFile, _ := os.Open(filepath)
 	reader := csv.NewReader(bufio.NewReader(csvFile))
 	var points []point.Point
@@ -83,5 +83,6 @@ func main(){
 		}
 	}
 
-	//fmt.Println(len(nonOutlierPoints))
+	//Generate the output file
+	filter_utility.WritePointsResult(nonOutlierPoints)
 }
